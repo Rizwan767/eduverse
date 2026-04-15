@@ -407,7 +407,7 @@ router.get("/:id/certificate", isLoggedIn, async (req, res) => {
     doc
       .fontSize(10)
       .text(
-        `Verify at: http://localhost:3000/courses/verify-certificate/${certificateId}`,
+        `Verify at: https://eduverse.onrender.com/courses/verify-certificate/${certificateId}`,
         {
           align: "center",
         },
