@@ -59,14 +59,29 @@
 
   <strong><%= lesson.title %></strong>
 
+  <!-- 🔥 NEW: content indicators -->
+  <div class="small text-muted mt-1">
+    🎥 Video
+    <% if (lesson.pdfNotes) { %>
+      | 📄 Notes
+    <% } %>
+    <% if (lesson.assignment) { %>
+      | 📝 Assignment
+    <% } %>
+  </div>
+
+  <!-- 🔥 KEEP YOUR DELETE BUTTON -->
   <% if (user && (user.role === "admin" || user._id.toString() === course.teacher.toString())) { %>
     <form method="POST" action="/courses/<%= course._id %>/lessons/<%= lesson._id %>/delete" class="mt-2">
-      <button class="btn btn-danger btn-sm w-100">Delete</button>
-    </form>
+  <button 
+    onclick="event.stopPropagation()" 
+    class="btn btn-danger btn-sm w-100">
+    Delete
+  </button>
+</form>
   <% } %>
 
 </div>
-
 <% }) %>
 
 </div>
@@ -138,6 +153,15 @@ function getVideoId(url){
 }
 
 function loadLesson(index){
+ // 🔥 ADD THIS PART HERE (TOP OF FUNCTION)
+
+  // remove active from all
+  document.querySelectorAll(".lesson-item").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  // add active to clicked one
+  document.querySelectorAll(".lesson-item")[index].classList.add("active");
 
   const lesson = lessons[index];
 

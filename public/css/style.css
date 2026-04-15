@@ -38,3 +38,10 @@ body {
     transform: translateY(0);
   }
 }
+.lesson-item.active {
+  background-color: #e0f2fe;
+  border-left: 4px solid #2563eb;
+}
+.lesson-item:hover {
+  background-color: #f1f5f9;
+}
