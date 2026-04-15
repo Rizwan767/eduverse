@@ -144,7 +144,7 @@
       </div>
 
       <p class="mt-2 mb-1">
-        <strong>Instructor:</strong> <%= course.teacher.name %>
+        <strong>Instructor:</strong> <%= course.teacher?.name || "No Instructor" %>
       </p>
 
       <p>
