@@ -397,8 +397,7 @@ router.get("/:id/certificate", isLoggedIn, async (req, res) => {
     doc
       .fontSize(12)
       .fillColor("#111827")
-      .text(`Instructor: ${course.teacher.name}`, 60, footerY);
-
+      .text(`Instructor: ${course.teacher?.name || "EduVerse"}`, 60, footerY);
     // Date
     doc.text(
       `Date: ${new Date().toLocaleDateString()}`,
@@ -430,7 +429,7 @@ router.get("/:id/certificate", isLoggedIn, async (req, res) => {
     doc
       .fontSize(10)
       .text(
-        `Verify at: https://eduverse.onrender.com/courses/verify-certificate/${certificateId}`,
+        `Verify at: https://eduverse-zd9x.onrender.com/courses/verify-certificate/${certificateId}`,
         {
           align: "center",
         },
