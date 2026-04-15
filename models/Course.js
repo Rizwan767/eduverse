@@ -42,6 +42,15 @@ const courseSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  certificateIssued: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      certificateId: String,
+    },
+  ],
 
   lessons: [lessonSchema],
 });

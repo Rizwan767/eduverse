@@ -1,32 +1,44 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
   <div class="container">
-    <!-- Logo / Brand -->
-    <a class="navbar-brand fw-bold" href="/dashboard"> EduVerse Academy </a>
 
-    <!-- Mobile Toggle -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-    >
+    <a class="navbar-brand fw-bold" href="/dashboard">
+      🎓 EduVerse
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav ms-auto align-items-center">
+
         <li class="nav-item">
-          <a class="nav-link" href="/dashboard"> Dashboard </a>
+          <a class="nav-link" href="/dashboard">Dashboard</a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="/courses"> Courses </a>
+          <a class="nav-link" href="/courses">Courses</a>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link text-danger" href="/logout"> Logout </a>
+        <% if (user && user.role === "admin") { %>
+          <li class="nav-item">
+            <a class="nav-link text-warning fw-bold" href="/admin">Admin Panel</a>
+          </li>
+        <% } %>
+
+        <!-- 👤 User Badge -->
+        <!-- <% if (user) { %>
+          <li class="nav-item ms-3">
+            <span class="badge bg-secondary text-uppercase">
+              <%= user.role %>
+            </span>
+          </li>
+        <% } %> -->
+
+        <li class="nav-item ms-3">
+          <a class="btn btn-danger btn-sm" href="/logout">Logout</a>
         </li>
+
       </ul>
     </div>
   </div>

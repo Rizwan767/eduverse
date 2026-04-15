@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Course Students</title>
+</head>
+<body>
+
+  <h1><%= course.title %></h1>
+
+  <p>Instructor: <%= course.teacher.name %></p>
+
+  <h2>Students Enrolled</h2>
+
+  <% if (users.length === 0) { %>
+    <p>No students enrolled</p>
+  <% } else { %>
+
+    <table border="1" cellpadding="10">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Progress</th>
+        <th>Certificate</th>
+        <th>Action</th>
+      </tr>
+
+      <% users.forEach(function(user) { %>
+
+        <% 
+          var totalLessons = course.lessons.length;
+          var completed = 0;
+
+          user.completedLessons.forEach(function(lessonId) {
+            course.lessons.forEach(function(lesson) {
+              if (lesson._id.toString() === lessonId.toString()) {
+                completed++;
+              }
+            });
+          });
+
+          var progress = totalLessons === 0 ? 0 : Math.round((completed / totalLessons) * 100);
+        %>
+
+        <tr>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <td><%= progress %>%</td>
+
+          <td>
+            <% if (progress === 100) { %>
+              ✅ Eligible
+            <% } else { %>
+              ❌ Not Eligible
+            <% } %>
+          </td>
+
+          <td>
+            <form method="POST" action="/admin/course/<%= course._id %>/remove/<%= user._id %>">
+              <button style="background:red; color:white;">Remove</button>
+            </form>
+          </td>
+        </tr>
+
+      <% }) %>
+
+    </table>
+
+  <% } %>
+
+  <br>
+  <a href="/admin">⬅ Back to Admin Panel</a>
+
+</body>
+</html>

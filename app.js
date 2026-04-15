@@ -17,13 +17,21 @@ app.use(
     saveUninitialized: false,
   }),
 );
+app.use(async (req, res, next) => {
+  if (req.session.userId) {
+    const user = await require("./models/User").findById(req.session.userId);
+    res.locals.user = user;
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
 
 const authRoutes = require("./routes/auth");
 app.use(authRoutes);
 
 const courseRoutes = require("./routes/courses");
-app.use(courseRoutes);
-
+app.use("/courses", courseRoutes);
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("MongoDB Connected"))
@@ -33,6 +41,8 @@ app.get("/", (req, res) => {
   res.send("EduVerse Server Running 🚀");
 });
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });

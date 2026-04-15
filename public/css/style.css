@@ -8,6 +8,7 @@ body {
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
+  border-radius: 10px;
 }
 
 .card:hover {
@@ -21,4 +22,19 @@ body {
 
 .btn:hover {
   transform: scale(1.05);
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

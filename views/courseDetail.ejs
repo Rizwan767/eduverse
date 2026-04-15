@@ -9,21 +9,34 @@
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
+  body {
+    background-color: #f8f9fa;
+  }
 
-.sidebar {
-height: 85vh;
-overflow-y: auto;
-border-right: 1px solid #ddd;
-}
+  .sidebar {
+    height: 85vh;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+  }
 
-.lesson-item{
-cursor:pointer;
-}
+  .lesson-item {
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.2s;
+  }
 
-.video-container{
-max-width:900px;
-}
+  .lesson-item:hover {
+    background-color: #f1f1f1;
+    transform: translateX(5px);
+  }
 
+  .video-container {
+    max-width: 900px;
+  }
+
+  .card {
+    border-radius: 12px;
+  }
 </style>
 
 </head>
@@ -32,21 +45,25 @@ max-width:900px;
 
 <%- include("partials/navbar") %>
 
-<div class="container-fluid mt-4">
-
+<div class="container mt-5 fade-in">
 <div class="row">
 
-<!-- LESSON SIDEBAR -->
+<!-- 🔥 SIDEBAR -->
+<div class="col-md-3 sidebar p-3 bg-white">
 
-<div class="col-md-3 sidebar p-3">
-
-<h5 class="mb-3">Lessons</h5>
+<h5 class="mb-3 fw-bold">📚 Lessons</h5>
 
 <% course.lessons.forEach((lesson,index)=>{ %>
 
 <div class="card mb-2 lesson-item p-2" onclick="loadLesson(<%= index %>)">
 
-<strong><%= lesson.title %></strong>
+  <strong><%= lesson.title %></strong>
+
+  <% if (user && (user.role === "admin" || user._id.toString() === course.teacher.toString())) { %>
+    <form method="POST" action="/courses/<%= course._id %>/lessons/<%= lesson._id %>/delete" class="mt-2">
+      <button class="btn btn-danger btn-sm w-100">Delete</button>
+    </form>
+  <% } %>
 
 </div>
 
@@ -55,37 +72,45 @@ max-width:900px;
 </div>
 
 
-<!-- VIDEO PLAYER AREA -->
-
+<!-- 🔥 MAIN CONTENT -->
 <div class="col-md-9 p-4">
 
-<h3 id="lessonTitle"></h3>
+<!-- 🎓 CERTIFICATE -->
+<div class="mb-4">
 
-<p id="lessonDesc" class="text-muted"></p>
+  <% if (progress === 100) { %>
+    <a href="/courses/<%= course._id %>/certificate" class="btn btn-success">
+      🎓 Download Certificate
+    </a>
+  <% } else { %>
+    <button class="btn btn-secondary" disabled>
+      🔒 Complete course to unlock certificate
+    </button>
+  <% } %>
 
-<div class="video-container mb-3">
+</div>
 
-<div class="ratio ratio-16x9">
+<!-- 🔥 LESSON TITLE -->
+<h3 id="lessonTitle" class="fw-bold"></h3>
 
+<p id="lessonDesc" class="text-muted mb-3"></p>
+
+<!-- 🎥 VIDEO -->
+<div class="video-container mb-4">
+
+<div class="ratio ratio-16x9 shadow-sm rounded">
 <iframe id="lessonVideo" frameborder="0" allowfullscreen></iframe>
-
 </div>
 
 </div>
 
+<!-- 📄 NOTES -->
+<div id="lessonNotes" class="mb-3"></div>
 
-<!-- PDF -->
+<!-- 📝 ASSIGNMENT -->
+<div id="lessonAssignment" class="mb-3"></div>
 
-<div id="lessonNotes"></div>
-
-
-<!-- ASSIGNMENT -->
-
-<div id="lessonAssignment"></div>
-
-
-<!-- COMPLETE BUTTON -->
-
+<!-- ✅ COMPLETE -->
 <div id="lessonComplete"></div>
 
 </div>
@@ -102,94 +127,60 @@ const lessons = <%- JSON.stringify(course.lessons) %>;
 const courseId = "<%= course._id %>";
 const completedLessons = <%- JSON.stringify(user.completedLessons) %>;
 
-
 function getVideoId(url){
-
-if(url.includes("watch?v=")){
-return url.split("watch?v=")[1].split("&")[0];
+  if(url.includes("watch?v=")){
+    return url.split("watch?v=")[1].split("&")[0];
+  }
+  if(url.includes("youtu.be/")){
+    return url.split("youtu.be/")[1].split("?")[0];
+  }
+  return "";
 }
-
-if(url.includes("youtu.be/")){
-return url.split("youtu.be/")[1].split("?")[0];
-}
-
-return "";
-
-}
-
 
 function loadLesson(index){
 
-const lesson = lessons[index];
+  const lesson = lessons[index];
 
-document.getElementById("lessonTitle").innerText = lesson.title;
-document.getElementById("lessonDesc").innerText = lesson.description || "";
+  document.getElementById("lessonTitle").innerText = lesson.title;
+  document.getElementById("lessonDesc").innerText = lesson.description || "";
 
-const videoId = getVideoId(lesson.videoUrl);
+  const videoId = getVideoId(lesson.videoUrl);
 
-document.getElementById("lessonVideo").src =
-"https://www.youtube.com/embed/" + videoId;
+  document.getElementById("lessonVideo").src =
+  "https://www.youtube.com/embed/" + videoId;
 
+  /* NOTES */
+  if(lesson.pdfNotes){
+    document.getElementById("lessonNotes").innerHTML =
+    `<a href="${lesson.pdfNotes}" target="_blank" class="btn btn-info">📄 View Notes</a>`;
+  } else {
+    document.getElementById("lessonNotes").innerHTML="";
+  }
 
+  /* ASSIGNMENT */
+  if(lesson.assignment){
+    document.getElementById("lessonAssignment").innerHTML =
+    `<div class="alert alert-warning"><strong>Assignment:</strong><p>${lesson.assignment}</p></div>`;
+  } else {
+    document.getElementById("lessonAssignment").innerHTML="";
+  }
 
-/* NOTES */
-
-if(lesson.pdfNotes){
-
-document.getElementById("lessonNotes").innerHTML =
-`<a href="${lesson.pdfNotes}" target="_blank" class="btn btn-info mb-3">View Notes (PDF)</a>`;
-
-}
-else{
-
-document.getElementById("lessonNotes").innerHTML="";
-
-}
-
-
-
-/* ASSIGNMENT */
-
-if(lesson.assignment){
-
-document.getElementById("lessonAssignment").innerHTML=
-`<div class="alert alert-warning"><strong>Assignment:</strong><p>${lesson.assignment}</p></div>`;
-
-}
-else{
-
-document.getElementById("lessonAssignment").innerHTML="";
+  /* COMPLETE BUTTON */
+  if(completedLessons.includes(lesson._id)){
+    document.getElementById("lessonComplete").innerHTML =
+    `<button class="btn btn-secondary" disabled>Completed ✅</button>`;
+  } else {
+    document.getElementById("lessonComplete").innerHTML =
+    `<form method="POST" action="/courses/${courseId}/lessons/${lesson._id}/complete">
+      <button class="btn btn-primary">Mark Complete</button>
+    </form>`;
+  }
 
 }
 
-
-
-/* COMPLETE BUTTON */
-
-if(completedLessons.includes(lesson._id)){
-
-document.getElementById("lessonComplete").innerHTML=
-`<button class="btn btn-secondary" disabled>Completed ✅</button>`;
-
-}
-else{
-
-document.getElementById("lessonComplete").innerHTML=
-`<form method="POST" action="/courses/${courseId}/lessons/${lesson._id}/complete">
-<button class="btn btn-primary">Mark Complete</button>
-</form>`;
-
-}
-
-}
-
-
-/* Load first lesson automatically */
-
-if(lessons.length>0){
-
-loadLesson(0);
-
+/* Load first lesson */
+if(lessons.length > 0){
+  loadLesson(0);
 }
 
 </script>
