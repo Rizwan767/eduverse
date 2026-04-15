@@ -3,6 +3,7 @@
   <head>
     <title>Add Lesson - EduVerse</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -16,10 +17,15 @@
     <div class="container mt-5 fade-in" style="max-width: 700px">
       <h2 class="mb-4 text-center">Add Lesson to <%= course.title %></h2>
 
-      <form action="/courses/<%= course._id %>/lessons" method="POST">
+      <!-- 🔥 IMPORTANT: enctype added -->
+      <form
+        action="/courses/<%= course._id %>/lessons"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <!-- TITLE -->
         <div class="mb-3">
           <label class="form-label">Lesson Title</label>
-
           <input
             type="text"
             name="title"
@@ -29,9 +35,9 @@
           />
         </div>
 
+        <!-- VIDEO -->
         <div class="mb-3">
           <label class="form-label">YouTube Video URL</label>
-
           <input
             type="text"
             name="videoUrl"
@@ -41,9 +47,9 @@
           />
         </div>
 
+        <!-- DESCRIPTION -->
         <div class="mb-3">
           <label class="form-label">Description</label>
-
           <textarea
             name="description"
             class="form-control"
@@ -52,26 +58,26 @@
           ></textarea>
         </div>
 
+        <!-- 📄 NOTES FILE -->
         <div class="mb-3">
-          <label class="form-label">PDF Notes Link</label>
-
+          <label class="form-label">Upload Notes (PDF / DOCX)</label>
           <input
-            type="text"
+            type="file"
             name="pdfNotes"
             class="form-control"
-            placeholder="Paste PDF link (optional)"
+            accept=".pdf,.doc,.docx"
           />
         </div>
 
+        <!-- 📝 ASSIGNMENT FILE -->
         <div class="mb-3">
-          <label class="form-label">Assignment</label>
-
-          <textarea
+          <label class="form-label">Upload Assignment (PDF / DOCX)</label>
+          <input
+            type="file"
             name="assignment"
             class="form-control"
-            rows="3"
-            placeholder="Write assignment instructions"
-          ></textarea>
+            accept=".pdf,.doc,.docx"
+          />
         </div>
 
         <button type="submit" class="btn btn-dark w-100">Add Lesson</button>
@@ -83,7 +89,9 @@
         </a>
       </div>
     </div>
+
     <%- include("partials/footer") %>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

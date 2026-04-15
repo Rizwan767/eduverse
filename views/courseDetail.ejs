@@ -158,12 +158,12 @@ function loadLesson(index){
   }
 
   /* ASSIGNMENT */
-  if(lesson.assignment){
-    document.getElementById("lessonAssignment").innerHTML =
-    `<div class="alert alert-warning"><strong>Assignment:</strong><p>${lesson.assignment}</p></div>`;
-  } else {
-    document.getElementById("lessonAssignment").innerHTML="";
-  }
+if(lesson.assignment){
+  document.getElementById("lessonAssignment").innerHTML =
+  `<a href="${lesson.assignment}" target="_blank" class="btn btn-warning">📝 View Assignment</a>`;
+} else {
+  document.getElementById("lessonAssignment").innerHTML="";
+}
 
   /* COMPLETE BUTTON */
   if(completedLessons.includes(lesson._id)){

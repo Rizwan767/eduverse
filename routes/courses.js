@@ -3,7 +3,18 @@ const Course = require("../models/Course");
 const User = require("../models/User");
 const { isLoggedIn, isAdmin } = require("./middleware");
 const PDFDocument = require("pdfkit");
+const multer = require("multer");
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 const router = express.Router();
 
 // 🔹 Verify Certificate
@@ -171,40 +182,52 @@ router.get("/:id/lessons/new", isLoggedIn, async (req, res) => {
 });
 
 // 🔹 Handle Add Lesson (Admin Only)
-router.post("/:id/lessons", isLoggedIn, async (req, res) => {
-  try {
-    const user = await User.findById(req.session.userId);
-    const course = await Course.findById(req.params.id);
+router.post(
+  "/:id/lessons",
+  isLoggedIn,
+  upload.fields([{ name: "pdfNotes" }, { name: "assignment" }]),
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.session.userId);
+      const course = await Course.findById(req.params.id);
 
-    // 🔐 Permission check
-    if (
-      user.role !== "admin" &&
-      !(
-        user.role === "teacher" &&
-        course.teacher.toString() === user._id.toString()
-      )
-    ) {
-      return res.send("Not authorized to add lessons");
+      // 🔐 Permission check
+      if (
+        user.role !== "admin" &&
+        !(
+          user.role === "teacher" &&
+          course.teacher.toString() === user._id.toString()
+        )
+      ) {
+        return res.send("Not authorized to add lessons");
+      }
+
+      const { title, videoUrl, description } = req.body;
+
+      const pdfNotes = req.files["pdfNotes"]
+        ? "/uploads/" + req.files["pdfNotes"][0].filename
+        : "";
+
+      const assignment = req.files["assignment"]
+        ? "/uploads/" + req.files["assignment"][0].filename
+        : "";
+      course.lessons.push({
+        title,
+        videoUrl,
+        description,
+        pdfNotes,
+        assignment,
+      });
+
+      await course.save();
+
+      res.redirect(`/courses/${req.params.id}`);
+    } catch (error) {
+      console.log(error);
+      res.send("Error adding lesson");
     }
-
-    const { title, videoUrl, description, pdfNotes, assignment } = req.body;
-
-    course.lessons.push({
-      title,
-      videoUrl,
-      description,
-      pdfNotes,
-      assignment,
-    });
-
-    await course.save();
-
-    res.redirect(`/courses/${req.params.id}`);
-  } catch (error) {
-    console.log(error);
-    res.send("Error adding lesson");
-  }
-});
+  },
+);
 
 // 🔹 View Single Course (Only If Enrolled)
 router.get("/:id", isLoggedIn, async (req, res) => {
