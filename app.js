@@ -37,10 +37,16 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
+// app.get("/", (req, res) => {
+//   res.send("EduVerse Server Running 🚀");
+// });
 app.get("/", (req, res) => {
-  res.send("EduVerse Server Running 🚀");
+  if (req.session.userId) {
+    res.redirect("/dashboard");
+  } else {
+    res.redirect("/login");
+  }
 });
-
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
